@@ -483,8 +483,7 @@ function Onboarding({t,settings,upSett,saveBudgets,addGoal,addIncome,saveSetting
     const nb={};
     Object.entries(DEFAULT_CATS).forEach(([k])=>{nb[k]={mode:buds[k]>0?'target':'open',amount:buds[k]||0};});
     await saveBudgets(nb);
-    await saveSettings({...settings,onboardingDone:true});
-  };
+    upSett({onboardingDone:true});  };
 
   const steps=[
     <div key={0} style={{textAlign:'center',padding:'20px 0'}}>
