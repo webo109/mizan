@@ -347,7 +347,7 @@ export default function App(){
     <div style={{fontFamily:fam,direction:t.dir,minHeight:'100vh',background:'var(--bg)',color:'var(--text)'}}>
       <style>{getCSS(settings.theme)}</style>
       {!settings.onboardingDone&&(
-        <Onboarding {...shared} setBudgets={saveBudgets} setGoals={setGoals} addGoal={addGoal}
+        <Onboarding {...shared} saveBudgets={saveBudgets} setGoals={setGoals} addGoal={addGoal}
           addIncome={addIncome} saveSettings={saveSettings} session={session}/>
       )}
       {settings.onboardingDone&&(<>
