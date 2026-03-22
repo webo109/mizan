@@ -248,6 +248,7 @@ export default function App(){
   const [customCats,setCustomCats]=useLS('mzn_ccats',[]);
   const [customISrc,setCustomISrc]=useLS('mzn_cisrc',[]);
   const [tab,setTab]=useState('dashboard');
+  const [prevTab,setPrevTab]=useState('dashboard');
   const [showMore,setShowMore]=useState(false);
 
   const t=TR[settings.lang];
@@ -331,7 +332,7 @@ export default function App(){
   const dueCount    =useMemo(()=>recurring.filter(r=>r.type==='expense'&&getDaysUntil(r.dayOfMonth)<=(r.reminderDays||1)).length,[recurring]);
 
   const shared={t,CATS,ITYPES,settings,upSett:p=>saveSettings({...settings,...p})};
-  const go=nextTab=>{setTab(nextTab);setShowMore(false);};
+  const go=nextTab=>{setPrevTab(tab);setTab(nextTab);setShowMore(false);};
 
   if(appLoading) return(
     <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:'100vh',gap:16,background:'#0A0E1A'}}>
@@ -351,7 +352,7 @@ export default function App(){
           addIncome={addIncome} saveSettings={saveSettings} session={session}/>
       )}
       {settings.onboardingDone&&(<>
-        <Header {...shared} tab={tab} showMore={showMore} setShowMore={setShowMore}/>
+        <Header {...shared} tab={tab} prevTab={prevTab} showMore={showMore} setShowMore={setShowMore} setTab={go}/>
         <div style={{maxWidth:520,margin:'0 auto',padding:'14px 14px 104px'}}>
           {tab==='dashboard' &&<Dashboard {...shared} expenses={expenses} incomes={incomes} goals={goals} budgets={budgets} monthIncome={monthIncome} monthExpense={monthExpense} monthSaved={monthSaved} freeToSpend={freeToSpend} mainGoal={mainGoal} setTab={go}/>}
           {tab==='expense'   &&<AddExpense {...shared} onSave={addExpense}/>}
@@ -370,16 +371,28 @@ export default function App(){
 }
 
 // ─── HEADER ──────────────────────────────────────────────────────
-function Header({t,settings,upSett,tab,showMore,setShowMore}){
+function Header({t,settings,upSett,tab,prevTab,showMore,setShowMore,setTab}){
   const isMore=MORE_TABS.includes(tab);
+  const initial=(settings.email||'A')[0].toUpperCase();
+  const emailName=(settings.email||'').split('@')[0]||'Account';
+  const canGoBack=tab!=='dashboard';
   return(
     <div style={{background:'var(--surf)',borderBottom:'1px solid var(--border)',padding:'11px 16px',position:'sticky',top:0,zIndex:99}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',maxWidth:520,margin:'0 auto'}}>
-        {isMore
-          ?<button onClick={()=>setShowMore(true)} style={{background:'var(--card2)',border:'1px solid var(--border)',borderRadius:10,padding:'7px 14px',cursor:'pointer',fontSize:13,color:'var(--gold)',fontWeight:600,fontFamily:'inherit'}}>{t.more.back}</button>
-          :<div><div style={{fontFamily:"'Playfair Display',serif",fontSize:21,color:'var(--gold)',lineHeight:1.1}}>{t.appName}</div><div style={{fontSize:10,color:'var(--muted)'}}>{t.tagline}</div></div>
-        }
-        <div style={{display:'flex',gap:8}}>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          {canGoBack&&(
+            <button onClick={()=>setTab(prevTab||'dashboard')} style={{background:'var(--card2)',border:'1px solid var(--border)',borderRadius:10,width:34,height:34,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',flexShrink:0,transition:'all .2s'}}
+              onMouseEnter={e=>e.currentTarget.style.borderColor='var(--gold)'}
+              onMouseLeave={e=>e.currentTarget.style.borderColor='var(--border)'}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+          )}
+          <button onClick={()=>setTab('dashboard')} style={{background:'none',border:'none',cursor:'pointer',padding:0,textAlign:'left'}}>
+            <div style={{fontFamily:"'Playfair Display',serif",fontSize:21,color:'var(--gold)',lineHeight:1.1}}>{t.appName}</div>
+            <div style={{fontSize:10,color:'var(--muted)'}}>{t.tagline}</div>
+          </button>
+        </div>
+        <div style={{display:'flex',gap:8,alignItems:'center'}}>
           <div className="toggle-wrap">
             <button className={`toggle-btn ${settings.theme==='dark'?'on':''}`} onClick={()=>upSett({theme:'dark'})}>🌙</button>
             <button className={`toggle-btn ${settings.theme==='light'?'on':''}`} onClick={()=>upSett({theme:'light'})}>☀️</button>
@@ -388,6 +401,15 @@ function Header({t,settings,upSett,tab,showMore,setShowMore}){
             <button className={`toggle-btn ${settings.lang==='en'?'on':''}`} onClick={()=>upSett({lang:'en'})}>EN</button>
             <button className={`toggle-btn ${settings.lang==='ar'?'on':''}`} onClick={()=>upSett({lang:'ar'})}>ع</button>
           </div>
+          <button onClick={()=>setTab('settings')} style={{display:'flex',alignItems:'center',gap:7,background:'var(--card2)',border:'1px solid var(--gold-br)',borderRadius:24,padding:'4px 12px 4px 4px',cursor:'pointer',fontFamily:'inherit',transition:'all .2s'}}
+            onMouseEnter={e=>e.currentTarget.style.borderColor='var(--gold)'}
+            onMouseLeave={e=>e.currentTarget.style.borderColor='var(--gold-br)'}>
+            <div style={{background:'linear-gradient(135deg,#F5A623,#E8930E)',borderRadius:'50%',width:26,height:26,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <span style={{fontSize:11,color:'#0A0E1A',fontWeight:700}}>{initial}</span>
+            </div>
+            <span style={{fontSize:12,color:'var(--text)',fontWeight:500,maxWidth:80,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{emailName}</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
         </div>
       </div>
     </div>
