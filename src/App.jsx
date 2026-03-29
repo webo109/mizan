@@ -67,7 +67,7 @@ const MORE_TABS=['reports','recurring','advisor','settings'];
 // ─── TRANSLATIONS ────────────────────────────────────────────────
 const TR={
   en:{
-    dir:'ltr',appName:'Mizan',tagline:'Your Smart Financial Balance',
+    dir:'ltr',appName:'Mizan',
     nav:{dashboard:'Home',goals:'Goals',expense:'Expense',income:'Income'},
     more:{title:'More',reports:'Reports',reportsub:'Spending breakdown',recurring:'Recurring',reccursub:'Bills & subscriptions',advisor:'AI Advisor',advisorsub:'Personal insights',settings:'Settings',settingssub:'Preferences & data',back:'← More'},
     auth:{login:'Sign In',signup:'Sign Up',email:'Email',password:'Password',submit:'Continue',switching:'Don\'t have an account?',switchingTo:'Sign Up',switchingBack:'Already have an account?',switchingToLogin:'Sign In',error:'Invalid email or password.',errorSignup:'Could not create account.',loading:'Please wait…'},
