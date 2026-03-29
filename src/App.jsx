@@ -1132,6 +1132,22 @@ function Settings({t,settings,upSett,budgets,saveBudgets,goals,customCats,setCus
   const addCat=()=>{if(!catForm.en)return;const id='c_'+uid();setCustomCats(p=>[...p,{id,...catForm,custom:true}]);saveBudgets({...budgets,[id]:{mode:'open',amount:0}});setCatForm({en:'',ar:'',icon:'🎨',color:CAT_COLORS[0]});sf(s.saved);};
   const addSrc=()=>{if(!catForm.en)return;const id='s_'+uid();setCustomISrc(p=>[...p,{id,...catForm,custom:true}]);setCatForm({en:'',ar:'',icon:'💸',color:CAT_COLORS[1]});sf(s.saved);};
   const exportCSV=()=>{const rows=[['Date','Type','Merchant','Category','Amount'],...expenses.map(e=>[e.date,'expense',e.merchant,e.category,e.amount])];const blob=new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'});const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download='mizan.csv';a.click();};
+  const handleClearData = async () => {
+  if (!window.confirm(s.clearConfirm)) return;
+  try {
+    const h = H(session.token);
+    await Promise.all([
+      fetch(`${SUPA}/rest/v1/expenses?user_id=eq.${session.userId}`,      { method:'DELETE', headers:h }),
+      fetch(`${SUPA}/rest/v1/incomes?user_id=eq.${session.userId}`,       { method:'DELETE', headers:h }),
+      fetch(`${SUPA}/rest/v1/goals?user_id=eq.${session.userId}`,         { method:'DELETE', headers:h }),
+      fetch(`${SUPA}/rest/v1/recurring?user_id=eq.${session.userId}`,     { method:'DELETE', headers:h }),
+      fetch(`${SUPA}/rest/v1/budgets?user_id=eq.${session.userId}`,       { method:'DELETE', headers:h }),
+      fetch(`${SUPA}/rest/v1/user_settings?user_id=eq.${session.userId}`, { method:'DELETE', headers:h }),
+    ]);
+  } catch(e) { console.error('Clear failed', e); }
+  setExpenses([]); setIncomes([]); setGoals([]); setRecurring([]);
+  saveBudgets({});
+};
   let expenses=[],incomes=[];
 
   return(
@@ -1199,7 +1215,7 @@ function Settings({t,settings,upSett,budgets,saveBudgets,goals,customCats,setCus
         <div className="section-title">⚙️ Data</div>
         <div style={{display:'flex',flexDirection:'column',gap:8}}>
           <button className="btn-s" onClick={exportCSV}>📊 {s.exportCSV}</button>
-          <button className="btn-danger" onClick={()=>{if(window.confirm(s.clearConfirm)){setExpenses([]);setIncomes([]);setGoals([]);setRecurring([]);}}}>🗑️ {s.clearData}</button>
+          <button className="btn-danger" onClick={handleClearData}>🗑️ {s.clearData}</button>
         </div>
       </div>
       <div style={{textAlign:'center',color:'var(--muted)',fontSize:11,padding:4}}>{s.info}</div>
